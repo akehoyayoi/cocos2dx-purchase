@@ -9,12 +9,14 @@
 #import "InAppPurchaseManager.h"
 #import "NSData+Base64.h"
 #include "EventHandlers.h"
+#include "PurchaseMacros.h"
 
 #ifndef SAFE_RELEASE
 #define SAFE_RELEASE(o) if (o!=nil) { [o release]; o=nil; }
 #endif
 
 using namespace std;
+USING_NS_CC_PURCHASE;
 
 @implementation InAppPurchaseManager
 

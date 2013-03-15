@@ -1,8 +1,9 @@
 #include "HelloWorldScene.h"
-#include "PurchaseController.h"
+#include "cocos-purchase.h"
 #include <string>
 
-using namespace cocos2d;
+USING_NS_CC;
+USING_NS_CC_PURCHASE;
 
 HelloWorld::HelloWorld()
 {

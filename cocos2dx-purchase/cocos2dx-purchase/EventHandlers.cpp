@@ -8,6 +8,8 @@
 
 #include "EventHandlers.h"
 
+NS_CC_PURCHASE_BEGIN
+
 EventHandlers* EventHandlers::m_instace = NULL;
 
 void EventHandlers::addHandler(IEventHandler* handler) {
@@ -41,3 +43,5 @@ void EventHandlers::failedServerProcess(void* data) {
 	for ( itr = handlers.begin(); itr != handlers.end(); itr++ )
 	    (*itr)->failedServerProcess(data);
 }
+
+NS_CC_PURCHASE_END

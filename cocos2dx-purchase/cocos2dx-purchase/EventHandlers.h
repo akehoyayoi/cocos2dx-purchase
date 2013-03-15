@@ -11,6 +11,9 @@
 
 #include "cocos2d.h"
 #include "ProductInfo.h"
+#include "PurchaseMacros.h"
+
+NS_CC_PURCHASE_BEGIN
 
 class IEventHandler {
 public:
@@ -47,5 +50,7 @@ private:
     EventHandlers(const EventHandlers& rhs);
     EventHandlers& operator=(const EventHandlers& rhs);
 };
+
+NS_CC_PURCHASE_END
 
 #endif /* defined(__cocos2dx_purchase__EventHandlers__) */

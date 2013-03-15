@@ -11,7 +11,10 @@
 
 #include "cocos2d.h"
 #include "ProductInfo.h"
+#include "PurchaseMacros.h"
 #include <exception>
+
+NS_CC_PURCHASE_BEGIN
 
 class PurchaseController {
 public:
@@ -34,5 +37,7 @@ private:
     PurchaseController(const PurchaseController& rhs);
     PurchaseController& operator=(const PurchaseController& rhs);
 };
+
+NS_CC_PURCHASE_END
 
 #endif /* defined(__cocos2dx_purchase__PurchaseController__) */
