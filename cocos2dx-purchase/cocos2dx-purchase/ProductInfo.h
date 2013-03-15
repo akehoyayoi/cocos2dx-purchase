@@ -11,8 +11,11 @@
 
 #include "cocos2d.h"
 #include <string>
+#include "PurchaseMacros.h"
 
 using namespace std;
+
+NS_CC_PURCHASE_BEGIN
 
 class ProductInfo {
 private:
@@ -65,5 +68,7 @@ public:
     inline int errorCode() { return this->m_errorCode; }
     inline string errorDescription() { return this->m_errorDescription; }
 };
+
+NS_CC_PURCHASE_END
 
 #endif /* defined(__cocos2dx_purchase__ProductInfo__) */

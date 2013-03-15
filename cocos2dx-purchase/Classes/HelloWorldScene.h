@@ -4,7 +4,7 @@
 #include "cocos2d.h"
 #include "EventHandlers.h"
 
-class HelloWorld : public cocos2d::CCLayer , public IEventHandler
+class HelloWorld : public cocos2d::CCLayer , public cocos2d::purchase::IEventHandler
 {
 public:
     HelloWorld();
@@ -21,8 +21,8 @@ public:
 
     // preprocessor macro for "static create()" constructor ( node() deprecated )
     CREATE_FUNC(HelloWorld);
-    virtual void successPurchase(PurchaseSuccessResult& purchaseResult);
-    virtual void failedPurchase(PurchaseFailedResult& purchaseResult);
+    virtual void successPurchase(cocos2d::purchase::PurchaseSuccessResult& purchaseResult);
+    virtual void failedPurchase(cocos2d::purchase::PurchaseFailedResult& purchaseResult);
     
 };
 

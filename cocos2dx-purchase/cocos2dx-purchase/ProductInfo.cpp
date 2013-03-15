@@ -8,6 +8,8 @@
 
 #include "ProductInfo.h"
 
+NS_CC_PURCHASE_BEGIN
+
 ProductInfo::ProductInfo(const string& productId ,
                          const string& name ,
                          int price)
@@ -34,3 +36,5 @@ PurchaseFailedResult::PurchaseFailedResult(const string& productId ,
 ,m_transactionState(transactionState)
 ,m_errorCode(errorCode)
 ,m_errorDescription(errorDescription){}
+
+NS_CC_PURCHASE_END
