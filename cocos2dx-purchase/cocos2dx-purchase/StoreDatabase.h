@@ -85,6 +85,15 @@ public:
         CC_SAFE_DELETE(db);
         return result;
     }
+    static CppSQLite3Query* execute(const char* sql) {
+        return StoreDatabase::execute(NULL, sql);
+    }
+    static CppSQLite3Query* execute(const char *dbName, const char *sql) {
+        CppSQLite3DB* db = dbName == NULL ? StoreDatabase::prepare() : StoreDatabase::prepare(dbName);
+        CppSQLite3Query* rs = StoreDatabase::execute(db, ccs(sql));
+        CC_SAFE_DELETE(db);
+        return rs;
+    }
 };
 
 #endif /* defined(__cocos2dx_purchase__StoreDatabase__) */

@@ -10,6 +10,8 @@
 #import "NSData+Base64.h"
 #include "EventHandlers.h"
 #include "PurchaseMacros.h"
+#include "StorageManager.h"
+#include <string>
 
 #ifndef SAFE_RELEASE
 #define SAFE_RELEASE(o) if (o!=nil) { [o release]; o=nil; }
@@ -43,14 +45,31 @@ USING_NS_CC_PURCHASE;
 
 - (BOOL)purchase:(NSString *) productId
 {
-    if([SKPaymentQueue canMakePayments] == NO) {
-        return NO;
-    }
-    
     // トランザクションのチェックを行う
     // 無ければ以降の処理を行う
     // 課金成功が残っていれば、成功処理を呼び出す
     // 課金成功以外が残っていれば、終了する
+    StorageManager* storageManager = StorageManager::getInstance();
+    PurchaseSuccessResult result = storageManager->getPurchase();
+    int transactionState = result.transactionState();
+    if(transactionState == SKPaymentTransactionStatePurchased){
+        EventHandlers::getInstance()->successPurchase(result);
+        CCLOG("previous purchase success");
+        return YES;
+    } else if(transactionState > 0) {
+        CCLOG("previous purchase failed");
+        return NO;
+    }
+
+    if([SKPaymentQueue canMakePayments] == NO) {
+        return NO;
+    }
+    
+    // 課金開始をトランザクションとして記録する(二重課金防止)
+    string product_id([productId UTF8String]);
+    string transaction_id("");
+    string transaction_receipt("");
+    storageManager->storePurchase(product_id, transaction_id, 99999, transaction_receipt);
     
     if (productRequest) {
         productRequest.delegate = nil;
@@ -109,7 +128,10 @@ USING_NS_CC_PURCHASE;
                 [queue finishTransaction: transaction];
                 string transationReceipt([[[transaction transactionReceipt] base64EncodedString] UTF8String]);
                 // 課金成功をDBに記録する
-                
+                StorageManager::getInstance()->storePurchase(productId,
+                                                             transactionId,
+                                                             transactionState,
+                                                             transationReceipt);
                 PurchaseSuccessResult result(productId,
                                              transactionId,
                                              transactionState,

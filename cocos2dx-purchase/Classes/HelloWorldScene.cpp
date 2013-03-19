@@ -95,6 +95,7 @@ void HelloWorld::menuCloseCallback(CCObject* pSender)
 void HelloWorld::successPurchase(PurchaseSuccessResult& purchaseResult)
 {
     CCLOG("success purchase");
+    PurchaseController::getInstance()->finishPurchase();
 }
 
 void HelloWorld::failedPurchase(PurchaseFailedResult& purchaseResult)

@@ -9,6 +9,7 @@
 #include "PurchaseController.h"
 
 #import "InAppPurchaseManager.h"
+#include "StorageManager.h"
 
 NS_CC_PURCHASE_BEGIN
 
@@ -20,7 +21,7 @@ bool PurchaseController::purchase(ProductInfo& productIndo){
 }
 
 bool PurchaseController::finishPurchase(){
-    // トランザクションをパージする
+    StorageManager::getInstance()->deletePurchase();
     return true;
 }
 
