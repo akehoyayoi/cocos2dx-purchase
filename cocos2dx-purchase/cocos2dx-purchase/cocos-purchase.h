@@ -2,8 +2,8 @@
 //  cocos-purchase.h
 //  cocos2dx-purchase
 //
-//  Created by OKAYA YOHEI on 13/03/15.
-//
+//  Created by Yohei Okaya on 2013/03/14.
+//  Copyright (c) 2013 , Yohei Okaya All rights reserved.
 //
 
 #ifndef cocos2dx_purchase_cocos_purchase_h

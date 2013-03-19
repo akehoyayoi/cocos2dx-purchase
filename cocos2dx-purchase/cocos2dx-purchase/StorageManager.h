@@ -2,8 +2,8 @@
 //  StorageManager.h
 //  cocos2dx-purchase
 //
-//  Created by OKAYA YOHEI on 13/03/19.
-//
+//  Created by Yohei Okaya on 2013/03/14.
+//  Copyright (c) 2013 , Yohei Okaya All rights reserved.
 //
 
 #ifndef __cocos2dx_purchase__StorageManager__
