@@ -10,6 +10,8 @@
 
 #define DBPATH "data.sqlite"
 
+NS_CC_PURCHASE_BEGIN
+
 CCString* getDatabaseFilePath(CCString* prefix)
 {
     CCFileUtils* pUtils = CCFileUtils::sharedFileUtils();
@@ -69,3 +71,5 @@ bool StoreDatabase::executeUpdate(CppSQLite3DB* db, CCString* sql)
     }
     return nRet > 0;
 }
+
+NS_CC_PURCHASE_END

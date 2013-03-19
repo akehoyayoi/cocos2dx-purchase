@@ -45,10 +45,10 @@ USING_NS_CC_PURCHASE;
 
 - (BOOL)purchase:(NSString *) productId
 {
-    // トランザクションのチェックを行う
-    // 無ければ以降の処理を行う
-    // 課金成功が残っていれば、成功処理を呼び出す
-    // 課金成功以外が残っていれば、終了する
+    // check transaction
+    // if transaction is nothing then continuerous process
+    // success purchase transaction , success purchase process 
+    // other , exit process
     StorageManager* storageManager = StorageManager::getInstance();
     PurchaseSuccessResult result = storageManager->getPurchase();
     int transactionState = result.transactionState();
@@ -65,7 +65,7 @@ USING_NS_CC_PURCHASE;
         return NO;
     }
     
-    // 課金開始をトランザクションとして記録する(二重課金防止)
+    // record transaction for duplicate payment
     string product_id([productId UTF8String]);
     string transaction_id("");
     string transaction_receipt("");
@@ -127,7 +127,7 @@ USING_NS_CC_PURCHASE;
             {
                 [queue finishTransaction: transaction];
                 string transationReceipt([[[transaction transactionReceipt] base64EncodedString] UTF8String]);
-                // 課金成功をDBに記録する
+                // store success purchase transaction
                 StorageManager::getInstance()->storePurchase(productId,
                                                              transactionId,
                                                              transactionState,
@@ -135,7 +135,7 @@ USING_NS_CC_PURCHASE;
                 PurchaseSuccessResult result(productId,
                                              transactionId,
                                              transactionState,
-                                             transationReceipt);
+                                             transationReceipt,0);
                 EventHandlers::getInstance()->successPurchase(result);
                 break;
             }
@@ -144,8 +144,6 @@ USING_NS_CC_PURCHASE;
                 [queue finishTransaction:transaction];
                 int errorCode = [[transaction error] code];
                 string errorDescription([[[transaction error] localizedDescription] UTF8String]);
-                // トランザクションをパージする？
-                
                 PurchaseFailedResult result(productId,
                                             transactionId,
                                             transactionState,

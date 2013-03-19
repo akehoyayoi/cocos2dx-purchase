@@ -12,26 +12,9 @@
 #include "cocos2d.h"
 #include <sqlite3.h>
 #include "CppSQLite3.h"
+#include "PurchaseMacros.h"
 
-USING_NS_CC;
-
-
-
-#define EXEC_SELECT_QUERY(sql, rs, func) EXEC_SELECT_QUERY_WITH_DB(NULL, sql, rs, func)
-
-#define EXEC_SELECT_QUERY_WITH_DB(dbName, sql, rs, func) \
-CppSQLite3DB* db = dbName == NULL ? DataAccessObject::prepare() : DataAccessObject::prepare((const char*)dbName);\
-if (db) {\
-rs = DataAccessObject::execute(db, ccs(sql));\
-if (rs) {\
-while(!rs->eof()) {\
-func\
-rs->nextRow();\
-}\
-}\
-CC_SAFE_DELETE(rs);\
-CC_SAFE_DELETE(db);\
-}
+NS_CC_PURCHASE_BEGIN
 
 inline CCString* strForColumn(CppSQLite3Query *rs, const char * columnName)
 {
@@ -52,6 +35,12 @@ inline bool doubleForColumn(CppSQLite3Query *rs, const char *columnName)
 {
     return rs->getFloatField(columnName);
 }
+
+inline long longForColumn(CppSQLite3Query *rs, const char *columnName)
+{
+    return rs->getInt64Field(columnName);
+}
+
 
 class StoreDatabase: public CCObject
 {
@@ -95,5 +84,7 @@ public:
         return rs;
     }
 };
+
+NS_CC_PURCHASE_END
 
 #endif /* defined(__cocos2dx_purchase__StoreDatabase__) */

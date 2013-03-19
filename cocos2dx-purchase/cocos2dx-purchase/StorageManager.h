@@ -2,8 +2,8 @@
 //  StorageManager.h
 //  cocos2dx-purchase
 //
-//  Created by OKAYA YOHEI on 13/03/19.
-//
+//  Created by Yohei Okaya on 2013/03/14.
+//  Copyright (c) 2013 , Yohei Okaya All rights reserved.
 //
 
 #ifndef __cocos2dx_purchase__StorageManager__
@@ -13,10 +13,12 @@
 #include <string>
 #include "StoreDatabase.h"
 #include "ProductInfo.h"
+#include "PurchaseMacros.h"
 
-USING_NS_CC;
-USING_NS_CC_PURCHASE;
+
 using namespace std;
+
+NS_CC_PURCHASE_BEGIN
 
 class StorageManager {
 public:
@@ -48,5 +50,6 @@ private:
     StorageManager& operator=(const StorageManager& rhs);
 };
 
+NS_CC_PURCHASE_END
 
 #endif /* defined(__cocos2dx_purchase__StorageManager__) */
