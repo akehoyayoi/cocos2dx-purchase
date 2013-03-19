@@ -135,7 +135,7 @@ USING_NS_CC_PURCHASE;
                 PurchaseSuccessResult result(productId,
                                              transactionId,
                                              transactionState,
-                                             transationReceipt);
+                                             transationReceipt,0);
                 EventHandlers::getInstance()->successPurchase(result);
                 break;
             }

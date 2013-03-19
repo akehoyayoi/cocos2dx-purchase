@@ -20,11 +20,13 @@ ProductInfo::ProductInfo(const string& productId ,
 PurchaseSuccessResult::PurchaseSuccessResult(const string& productId ,
                                              const string& transactionId ,
                                              int transactionState ,
-                                             const string& transationReceipt)
+                                             const string& transationReceipt,
+                                             double transactionDate)
 : m_productId(productId)
 , m_transactionId(transactionId)
 , m_transactionState(transactionState)
-, m_transactionReceipt(transationReceipt) {}
+, m_transactionReceipt(transationReceipt)
+, m_transactionDate(transactionDate){}
 
 PurchaseFailedResult::PurchaseFailedResult(const string& productId ,
                                            const string& transactionId ,

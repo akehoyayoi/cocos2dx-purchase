@@ -18,7 +18,8 @@ void StorageManager::createDatabase(){
                                     "product_id TEXT , "
                                     "transaction_id TEXT , "
                                     "transaction_state INTEGER , "
-                                    "transaction_receipt TEXT)") == false){
+                                    "transaction_receipt TEXT , "
+                                    "transaction_date DOUBLE)") == false){
         CCLOG("already : purchase_info migrate");
     }
 }
@@ -45,31 +46,37 @@ void StorageManager::insertPurchase(string& productId,
                                                "product_id ,"
                                                "transaction_id , "
                                                "transaction_state , "
-                                               "transaction_receipt) values ('%s','%s','%d','%s')",
+                                               "transaction_receipt , "
+                                               "transaction_date) values ('%s','%s','%d','%s',datetime('now'))",
                                                productId.c_str(),
                                                transactionId.c_str(),
                                                transactionState,
                                                transactionReceipt.c_str());
-    if(StoreDatabase::executeUpdate(PURCHASE_INFO, sql->getCString()) == false) {
+    if(StoreDatabase::executeUpdate(PURCHASE_INFO, sql->getCString())) {
+        CCLOG("success : insert purchase_info");
+    } else {
         CCLOG("failed : insert purchase_info");
     }
 }
 
 void StorageManager::deletePurchase(){
     // delete purcahse_info
-    if(StoreDatabase::executeUpdate(PURCHASE_INFO, "delete from purchase_info") == false){
+    if(StoreDatabase::executeUpdate(PURCHASE_INFO, "delete from purchase_info")){
+        CCLOG("success : delete purchase_info");
+    } else {
         CCLOG("failed : delete purchase_info");
     }
 }
 
 PurchaseSuccessResult StorageManager::getPurchase(){
     CppSQLite3Query* rs = StoreDatabase::execute(PURCHASE_INFO, "select * from purchase_info");
-    if(rs == NULL) return PurchaseSuccessResult("","",-1,"");
-    if(rs->eof()) return PurchaseSuccessResult("","",-1,"");
+    if(rs == NULL) return PurchaseSuccessResult("","",-1,"",0);
+    if(rs->eof()) return PurchaseSuccessResult("","",-1,"",0);
     PurchaseSuccessResult result(strForColumn(rs, "product_id")->getCString(),
                                  strForColumn(rs, "transaction_id")->getCString(),
                                  intForColumn(rs, "transaction_state"),
-                                 strForColumn(rs, "transaction_receipt")->getCString());
+                                 strForColumn(rs, "transaction_receipt")->getCString(),
+                                 doubleForColumn(rs, "transaction_date"));
     CC_SAFE_DELETE(rs);
     return result;
 }

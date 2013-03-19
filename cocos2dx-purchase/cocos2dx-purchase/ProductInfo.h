@@ -38,15 +38,18 @@ private:
     string m_transactionId;
     int m_transactionState;
     string m_transactionReceipt;
+    double m_transactionDate;
 public:
     PurchaseSuccessResult(const string& productId ,
                           const string& transactionId ,
                           int transactionState ,
-                          const string& transationReceipt);
+                          const string& transationReceipt,
+                          double transactionDate);
     inline string productId() { return this->m_productId; }
     inline string transactionId() { return this->m_transactionId; }
     inline int transactionState() { return this->m_transactionState; }
     inline string transactionReceipt() { return this->m_transactionReceipt; }
+    inline double transactionDate() { return this->m_transactionDate; }
 };
 
 class PurchaseFailedResult {

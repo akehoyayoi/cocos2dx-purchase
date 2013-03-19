@@ -15,24 +15,6 @@
 
 USING_NS_CC;
 
-
-
-#define EXEC_SELECT_QUERY(sql, rs, func) EXEC_SELECT_QUERY_WITH_DB(NULL, sql, rs, func)
-
-#define EXEC_SELECT_QUERY_WITH_DB(dbName, sql, rs, func) \
-CppSQLite3DB* db = dbName == NULL ? DataAccessObject::prepare() : DataAccessObject::prepare((const char*)dbName);\
-if (db) {\
-rs = DataAccessObject::execute(db, ccs(sql));\
-if (rs) {\
-while(!rs->eof()) {\
-func\
-rs->nextRow();\
-}\
-}\
-CC_SAFE_DELETE(rs);\
-CC_SAFE_DELETE(db);\
-}
-
 inline CCString* strForColumn(CppSQLite3Query *rs, const char * columnName)
 {
     return ccs(rs->getStringField(columnName));
