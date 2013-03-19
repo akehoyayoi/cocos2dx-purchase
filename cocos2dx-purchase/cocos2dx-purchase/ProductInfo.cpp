@@ -21,7 +21,7 @@ PurchaseSuccessResult::PurchaseSuccessResult(const string& productId ,
                                              const string& transactionId ,
                                              int transactionState ,
                                              const string& transationReceipt,
-                                             double transactionDate)
+                                             long transactionDate)
 : m_productId(productId)
 , m_transactionId(transactionId)
 , m_transactionState(transactionState)

@@ -12,8 +12,9 @@
 #include "cocos2d.h"
 #include <sqlite3.h>
 #include "CppSQLite3.h"
+#include "PurchaseMacros.h"
 
-USING_NS_CC;
+NS_CC_PURCHASE_BEGIN
 
 inline CCString* strForColumn(CppSQLite3Query *rs, const char * columnName)
 {
@@ -34,6 +35,12 @@ inline bool doubleForColumn(CppSQLite3Query *rs, const char *columnName)
 {
     return rs->getFloatField(columnName);
 }
+
+inline long longForColumn(CppSQLite3Query *rs, const char *columnName)
+{
+    return rs->getInt64Field(columnName);
+}
+
 
 class StoreDatabase: public CCObject
 {
@@ -77,5 +84,7 @@ public:
         return rs;
     }
 };
+
+NS_CC_PURCHASE_END
 
 #endif /* defined(__cocos2dx_purchase__StoreDatabase__) */

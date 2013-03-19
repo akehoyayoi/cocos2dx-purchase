@@ -13,10 +13,12 @@
 #include <string>
 #include "StoreDatabase.h"
 #include "ProductInfo.h"
+#include "PurchaseMacros.h"
 
-USING_NS_CC;
-USING_NS_CC_PURCHASE;
+
 using namespace std;
+
+NS_CC_PURCHASE_BEGIN
 
 class StorageManager {
 public:
@@ -48,5 +50,6 @@ private:
     StorageManager& operator=(const StorageManager& rhs);
 };
 
+NS_CC_PURCHASE_END
 
 #endif /* defined(__cocos2dx_purchase__StorageManager__) */

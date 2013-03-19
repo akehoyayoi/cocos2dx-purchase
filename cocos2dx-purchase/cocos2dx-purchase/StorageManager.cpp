@@ -10,6 +10,8 @@
 
 #define PURCHASE_INFO "purchase_info"
 
+NS_CC_PURCHASE_BEGIN
+
 StorageManager* StorageManager::m_instance = NULL;
 
 void StorageManager::createDatabase(){
@@ -19,7 +21,7 @@ void StorageManager::createDatabase(){
                                     "transaction_id TEXT , "
                                     "transaction_state INTEGER , "
                                     "transaction_receipt TEXT , "
-                                    "transaction_date DOUBLE)") == false){
+                                    "transaction_date INTEGER)") == false){
         CCLOG("already : purchase_info migrate");
     }
 }
@@ -42,16 +44,19 @@ void StorageManager::insertPurchase(string& productId,
                                     int transactionState,
                                     string& transactionReceipt){
     // insert purchase_info
+    time_t t;
+    time(&t);
     CCString* sql = CCString::createWithFormat("insert or replace into purchase_info("
                                                "product_id ,"
                                                "transaction_id , "
                                                "transaction_state , "
                                                "transaction_receipt , "
-                                               "transaction_date) values ('%s','%s','%d','%s',datetime('now'))",
+                                               "transaction_date) values ('%s','%s','%d','%s','%ld')",
                                                productId.c_str(),
                                                transactionId.c_str(),
                                                transactionState,
-                                               transactionReceipt.c_str());
+                                               transactionReceipt.c_str(),
+                                               t);
     if(StoreDatabase::executeUpdate(PURCHASE_INFO, sql->getCString())) {
         CCLOG("success : insert purchase_info");
     } else {
@@ -76,7 +81,9 @@ PurchaseSuccessResult StorageManager::getPurchase(){
                                  strForColumn(rs, "transaction_id")->getCString(),
                                  intForColumn(rs, "transaction_state"),
                                  strForColumn(rs, "transaction_receipt")->getCString(),
-                                 doubleForColumn(rs, "transaction_date"));
+                                 longForColumn(rs, "transaction_date"));
     CC_SAFE_DELETE(rs);
     return result;
 }
+
+NS_CC_PURCHASE_END
