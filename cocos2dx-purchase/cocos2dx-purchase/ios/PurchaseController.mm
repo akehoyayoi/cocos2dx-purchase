@@ -12,11 +12,16 @@
 
 NS_CC_PURCHASE_BEGIN
 
-PurchaseController* PurchaseController::m_instace = NULL;
+PurchaseController* PurchaseController::m_instance = NULL;
 
 bool PurchaseController::purchase(ProductInfo& productIndo){
     NSString* productId = [[NSString alloc] initWithUTF8String:productIndo.productId().c_str()];
     return [[InAppPurchaseManager getInstance] purchase:productId];
+}
+
+bool PurchaseController::finishPurchase(){
+    // トランザクションをパージする
+    return true;
 }
 
 NS_CC_PURCHASE_END

@@ -46,6 +46,12 @@ USING_NS_CC_PURCHASE;
     if([SKPaymentQueue canMakePayments] == NO) {
         return NO;
     }
+    
+    // トランザクションのチェックを行う
+    // 無ければ以降の処理を行う
+    // 課金成功が残っていれば、成功処理を呼び出す
+    // 課金成功以外が残っていれば、終了する
+    
     if (productRequest) {
         productRequest.delegate = nil;
         SAFE_RELEASE(productRequest);
@@ -102,6 +108,8 @@ USING_NS_CC_PURCHASE;
             {
                 [queue finishTransaction: transaction];
                 string transationReceipt([[[transaction transactionReceipt] base64EncodedString] UTF8String]);
+                // 課金成功をDBに記録する
+                
                 PurchaseSuccessResult result(productId,
                                              transactionId,
                                              transactionState,
@@ -114,6 +122,8 @@ USING_NS_CC_PURCHASE;
                 [queue finishTransaction:transaction];
                 int errorCode = [[transaction error] code];
                 string errorDescription([[[transaction error] localizedDescription] UTF8String]);
+                // トランザクションをパージする？
+                
                 PurchaseFailedResult result(productId,
                                             transactionId,
                                             transactionState,

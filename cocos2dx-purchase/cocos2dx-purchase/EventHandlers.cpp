@@ -32,16 +32,4 @@ void EventHandlers::failedPurchase(PurchaseFailedResult& purchaseResult) {
 	    (*itr)->failedPurchase(purchaseResult);
 }
 
-void EventHandlers::successServerProcess(void* data) {
-	set<IEventHandler*>::iterator itr;
-	for ( itr = handlers.begin(); itr != handlers.end(); itr++ )
-	    (*itr)->successServerProcess(data);
-}
-
-void EventHandlers::failedServerProcess(void* data) {
-	set<IEventHandler*>::iterator itr;
-	for ( itr = handlers.begin(); itr != handlers.end(); itr++ )
-	    (*itr)->failedServerProcess(data);
-}
-
 NS_CC_PURCHASE_END

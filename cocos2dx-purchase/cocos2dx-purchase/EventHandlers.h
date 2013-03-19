@@ -19,8 +19,6 @@ class IEventHandler {
 public:
     virtual void successPurchase(PurchaseSuccessResult& purchaseResult) = 0;
     virtual void failedPurchase(PurchaseFailedResult& purchaseResult) = 0;
-    virtual void successServerProcess(void* data) {}
-    virtual void failedServerProcess(void* data) {}
 };
 
 class EventHandlers {
@@ -38,10 +36,6 @@ public:
     // this method is called by cocos2dx-purchase
     void successPurchase(PurchaseSuccessResult& purchaseResult);
     void failedPurchase(PurchaseFailedResult& purchaseResult);
-    
-    // if necessary this method is called by application
-    void successServerProcess(void* data);
-    void failedServerProcess(void* data);
     
 private:
     static EventHandlers* m_instace;

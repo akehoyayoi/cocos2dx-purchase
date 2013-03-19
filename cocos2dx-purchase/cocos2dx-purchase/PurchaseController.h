@@ -23,16 +23,18 @@ public:
     //     iOS     : PurchaseController.mm
     //     Android : PurchaseController.cpp
     static PurchaseController* getInstance(){
-        if(m_instace == NULL){
-            m_instace = new PurchaseController();
+        if(m_instance == NULL){
+            m_instance = new PurchaseController();
         }
-        return m_instace;
+        return m_instance;
     }
     
     bool purchase(ProductInfo& productIndo);
     
+    bool finishPurchase();
+    
 private:
-    static PurchaseController* m_instace;
+    static PurchaseController* m_instance;
     PurchaseController(){}
     PurchaseController(const PurchaseController& rhs);
     PurchaseController& operator=(const PurchaseController& rhs);
