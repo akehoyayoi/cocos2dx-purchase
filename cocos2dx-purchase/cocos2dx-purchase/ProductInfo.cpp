@@ -18,24 +18,14 @@ ProductInfo::ProductInfo(const string& productId ,
 , m_price(price){}
 
 PurchaseSuccessResult::PurchaseSuccessResult(const string& productId ,
-                                             const string& transactionId ,
-                                             int transactionState ,
-                                             const string& transationReceipt,
                                              long transactionDate)
 : m_productId(productId)
-, m_transactionId(transactionId)
-, m_transactionState(transactionState)
-, m_transactionReceipt(transationReceipt)
 , m_transactionDate(transactionDate){}
 
 PurchaseFailedResult::PurchaseFailedResult(const string& productId ,
-                                           const string& transactionId ,
-                                           int transactionState ,
                                            int errorCode ,
                                            const string& errorDescription)
 :m_productId(productId)
-,m_transactionId(transactionId)
-,m_transactionState(transactionState)
 ,m_errorCode(errorCode)
 ,m_errorDescription(errorDescription){}
 

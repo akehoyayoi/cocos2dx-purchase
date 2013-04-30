@@ -9,7 +9,7 @@
 #include "PurchaseController.h"
 
 #import "InAppPurchaseManager.h"
-#include "StorageManager.h"
+#include "StorageManagerIOS.h"
 
 NS_CC_PURCHASE_BEGIN
 

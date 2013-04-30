@@ -10,7 +10,7 @@
 #import "NSData+Base64.h"
 #include "EventHandlers.h"
 #include "PurchaseMacros.h"
-#include "StorageManager.h"
+#include "StorageManagerIOS.h"
 #include <string>
 
 #ifndef SAFE_RELEASE
