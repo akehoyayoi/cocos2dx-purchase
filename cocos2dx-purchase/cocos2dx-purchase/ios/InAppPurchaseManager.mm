@@ -50,10 +50,10 @@ USING_NS_CC_PURCHASE;
     // success purchase transaction , success purchase process 
     // other , exit process
     StorageManager* storageManager = StorageManager::getInstance();
-    PurchaseSuccessResult result = storageManager->getPurchase();
+    PurchaseSuccessResultIOS result = storageManager->getPurchase();
     int transactionState = result.transactionState();
     if(transactionState == SKPaymentTransactionStatePurchased){
-        EventHandlers::getInstance()->successPurchase(result);
+        EventHandlers::getInstance()->successPurchase(&result);
         CCLOG("previous purchase success");
         return YES;
     } else if(transactionState > 0) {
@@ -87,14 +87,14 @@ USING_NS_CC_PURCHASE;
 {
 
     if(response == nil){
-        PurchaseFailedResult result(string("") , string("") , 0 , 99999 , string("invalid response"));
-        EventHandlers::getInstance()->failedPurchase(result);
+        PurchaseFailedResultIOS result(string("") , string("") , 0 , 99999 , string("invalid response"));
+        EventHandlers::getInstance()->failedPurchase(&result);
         return;
     }
     
     if([[response products] count] == 0){
-        PurchaseFailedResult result(string("") , string("") , 0 , 99999 , string("valid product is nothing"));
-        EventHandlers::getInstance()->failedPurchase(result);
+        PurchaseFailedResultIOS result(string("") , string("") , 0 , 99999 , string("valid product is nothing"));
+        EventHandlers::getInstance()->failedPurchase(&result);
         return;
     }
     
@@ -132,11 +132,11 @@ USING_NS_CC_PURCHASE;
                                                              transactionId,
                                                              transactionState,
                                                              transationReceipt);
-                PurchaseSuccessResult result(productId,
+                PurchaseSuccessResultIOS result(productId,
                                              transactionId,
                                              transactionState,
                                              transationReceipt,0);
-                EventHandlers::getInstance()->successPurchase(result);
+                EventHandlers::getInstance()->successPurchase(&result);
                 break;
             }
             case SKPaymentTransactionStateFailed: // failed purchase
@@ -144,12 +144,12 @@ USING_NS_CC_PURCHASE;
                 [queue finishTransaction:transaction];
                 int errorCode = [[transaction error] code];
                 string errorDescription([[[transaction error] localizedDescription] UTF8String]);
-                PurchaseFailedResult result(productId,
+                PurchaseFailedResultIOS result(productId,
                                             transactionId,
                                             transactionState,
                                             errorCode,
                                             errorDescription);
-                EventHandlers::getInstance()->failedPurchase(result);
+                EventHandlers::getInstance()->failedPurchase(&result);
                 break;
             }
             case SKPaymentTransactionStateRestored: // not support Non-Cosumable item

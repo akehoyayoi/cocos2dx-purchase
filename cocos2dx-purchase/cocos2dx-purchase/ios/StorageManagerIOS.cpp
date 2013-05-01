@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 , Yohei Okaya All rights reserved.
 //
 
-#include "StorageManager.h"
+#include "StorageManagerIOS.h"
 
 #define PURCHASE_INFO "purchase_info"
 
@@ -73,11 +73,11 @@ void StorageManager::deletePurchase(){
     }
 }
 
-PurchaseSuccessResult StorageManager::getPurchase(){
+PurchaseSuccessResultIOS StorageManager::getPurchase(){
     CppSQLite3Query* rs = StoreDatabase::execute(PURCHASE_INFO, "select * from purchase_info");
-    if(rs == NULL) return PurchaseSuccessResult("","",-1,"",0);
-    if(rs->eof()) return PurchaseSuccessResult("","",-1,"",0);
-    PurchaseSuccessResult result(strForColumn(rs, "product_id")->getCString(),
+    if(rs == NULL) return PurchaseSuccessResultIOS("","",-1,"",0);
+    if(rs->eof()) return PurchaseSuccessResultIOS("","",-1,"",0);
+    PurchaseSuccessResultIOS result(strForColumn(rs, "product_id")->getCString(),
                                  strForColumn(rs, "transaction_id")->getCString(),
                                  intForColumn(rs, "transaction_state"),
                                  strForColumn(rs, "transaction_receipt")->getCString(),

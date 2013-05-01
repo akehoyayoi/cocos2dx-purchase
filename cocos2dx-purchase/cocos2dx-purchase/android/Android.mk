@@ -15,7 +15,7 @@ ProductInfoAndroid.cpp \
 ../EventHandlers.cpp \
 ../ProductInfo.cpp \
 ../StoreDatabase.cpp \
-../libs/cppSQLite/CppSQLite3.cpp
+#../libs/cppSQLite/CppSQLite3.cpp
 
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/..
 

@@ -15,21 +15,18 @@ PurchaseSuccessResultIOS::PurchaseSuccessResultIOS(const string& productId ,
                                                    int transactionState ,
                                                    const string& transationReceipt,
                                                    long transactionDate)
-: m_productId(productId)
+: PurchaseSuccessResult(productId, transactionDate)
 , m_transactionId(transactionId)
 , m_transactionState(transactionState)
-, m_transactionReceipt(transationReceipt)
-, m_transactionDate(transactionDate){}
+, m_transactionReceipt(transationReceipt){}
 
 PurchaseFailedResultIOS::PurchaseFailedResultIOS(const string& productId ,
                                                  const string& transactionId ,
                                                  int transactionState ,
                                                  int errorCode ,
                                                  const string& errorDescription)
-: m_productId(productId)
+: PurchaseFailedResult(productId, errorCode, errorDescription)
 , m_transactionId(transactionId)
-, m_transactionState(transactionState)
-, m_errorCode(errorCode)
-, m_errorDescription(errorDescription){}
+, m_transactionState(transactionState){}
 
 NS_CC_PURCHASE_END

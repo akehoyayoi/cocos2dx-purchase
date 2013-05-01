@@ -39,6 +39,7 @@ protected:
 public:
     PurchaseSuccessResult(const string& productId ,
                           long transactionDate);
+    virtual ~PurchaseSuccessResult(){};
     inline string productId() { return this->m_productId; }
     inline long transactionDate() { return this->m_transactionDate; }
     inline long elapsedTime() {
@@ -57,6 +58,7 @@ public:
     PurchaseFailedResult(const string& productId ,
                          int errorCode ,
                          const string& errorDescription);
+    virtual ~PurchaseFailedResult(){};
     inline string productId() { return this->m_productId; }
     inline int errorCode() { return this->m_errorCode; }
     inline string errorDescription() { return this->m_errorDescription; }

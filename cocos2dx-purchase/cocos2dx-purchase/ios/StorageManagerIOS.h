@@ -12,7 +12,7 @@
 #include "cocos2d.h"
 #include <string>
 #include "StoreDatabase.h"
-#include "ProductInfo.h"
+#include "ProductInfoIOS.h"
 #include "PurchaseMacros.h"
 
 
@@ -40,7 +40,7 @@ public:
                         string& transactionReceipt);
     void deletePurchase();
 
-    PurchaseSuccessResult getPurchase();
+    PurchaseSuccessResultIOS getPurchase();
     
     
 private:
