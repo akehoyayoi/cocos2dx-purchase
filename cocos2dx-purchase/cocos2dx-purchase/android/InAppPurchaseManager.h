@@ -21,6 +21,12 @@ typedef enum {
     SKPaymentTransactionStateRestored       // Transaction was restored from user's purchase history.  Client should complete the transaction.
 } SKPaymentTransactionState;
 
+typedef enum {
+    BillingServiceDisconnected,
+    BillingServiceConnecting,
+    BillingServiceConnected
+} BillingServiceInit;
+
 class InAppPurchaseManager
 : public CCObject
 //, public SKProductsRequestDelegate
@@ -34,15 +40,20 @@ public:
 
 protected:
 
+    static void purchaseMain();
     static void BillingInitHandler(int error);
     static void PurchasedHandler(int result);
+    static void ConsumeOwnItemtHandler(int result);
     static void ConsumeHandler(int result);
 
 private:
     InAppPurchaseManager() {};
     ~InAppPurchaseManager() {};
 
-    static bool m_init;
+    static CCString* m_productId;
+    static int m_price;
+    static bool m_retry;
+    static BillingServiceInit m_init;
 
     InAppPurchaseManager(const InAppPurchaseManager&);
     InAppPurchaseManager& operator=(const InAppPurchaseManager&);

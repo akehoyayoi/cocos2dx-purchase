@@ -15,6 +15,9 @@ namespace GoogleBilling
 	static const int PURCHASE_SUCCESS = 2;
 	static const int PURCHASE_ALREADY_PURCHASED = 3;
 	static const int PURCHASE_FAIL = 4;
+	static const int PURCHASE_USER_CANCELED =5;
+	static const int CONSUME_SUCCESS = 6;
+	static const int CONSUME_FAIL = 7;
 
     struct Billing
     {
@@ -22,5 +25,6 @@ namespace GoogleBilling
         static bool init(actionFinished callback);
         static void purchase(const char* item, int amount, actionFinished callback);
         static void consume(const char* purchaseData, const char* signature, actionFinished callback);
+        static void consumeOwnItem(const char* productId, actionFinished callback);
     };
 };

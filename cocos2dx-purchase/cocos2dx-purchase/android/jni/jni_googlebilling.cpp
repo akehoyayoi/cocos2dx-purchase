@@ -60,6 +60,23 @@ namespace GoogleBilling
             t.env->DeleteLocalRef(t.classID);
         }
     }
+
+    void Billing::consumeOwnItem(const char* productId, actionFinished callback)
+    {
+        JniMethodInfo t;
+        if (JniHelper::getStaticMethodInfo(t,
+                                           "com/geishatokyo/purchase/GoogleBilling",
+                                           "consumeOwnItem",
+                                           "(Ljava/lang/String;Ljava/lang/String;)V"))
+        {
+            jstring arg = t.env->NewStringUTF(productId);
+            jlong arg2 = (long)(void*)callback;
+            
+            t.env->CallStaticVoidMethod(t.classID, t.methodID, arg, arg2);
+            t.env->DeleteLocalRef(arg);
+            t.env->DeleteLocalRef(t.classID);
+        }
+    }
 }
 
 extern "C"

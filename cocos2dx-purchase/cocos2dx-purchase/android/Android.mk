@@ -31,6 +31,6 @@ $(info LOCAL_C_INCLUDES=$(LOCAL_C_INCLUDES))
 PCH_FILE := $(LOCAL_PATH)/../../Prefix.pch
 
 # 追加するC++のコンパイルフラグ
-LOCAL_CPPFLAGS += -include $(PCH_FILE) -fexceptions
+LOCAL_CPPFLAGS += -include $(PCH_FILE) -fexceptions -DDEBUG -DCOCOS2D_DEBUG=2
 
 include $(BUILD_STATIC_LIBRARY)
