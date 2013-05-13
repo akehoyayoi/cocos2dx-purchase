@@ -21,10 +21,10 @@ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/..
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/.. \
                     $(LOCAL_PATH)/../libs/cppSQLite \
-                    $(COCOS2DX_ROOT)/cocos2dx \
-                    $(COCOS2DX_ROOT)/cocos2dx/include \
-                    $(COCOS2DX_ROOT)/cocos2dx/kazmath/include \
-                    $(COCOS2DX_ROOT)/cocos2dx/platform/android
+                    $(LOCAL_PATH)/../../../../cocos2dx \
+                    $(LOCAL_PATH)/../../../../cocos2dx/include \
+                    $(LOCAL_PATH)/../../../../cocos2dx/kazmath/include \
+                    $(LOCAL_PATH)/../../../../cocos2dx/platform/android
 
 $(info LOCAL_C_INCLUDES=$(LOCAL_C_INCLUDES))
 
