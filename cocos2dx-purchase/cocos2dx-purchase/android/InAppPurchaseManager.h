@@ -29,14 +29,14 @@ typedef enum {
 
 class InAppPurchaseManager
 : public CCObject
-//, public SKProductsRequestDelegate
-//, public SKPaymentTransactionObserver
 {
 public:
     static InAppPurchaseManager& getInstance();
     bool purchase(CCString * productId, int price);
-    void consume(const char* purchaseData, const char* signature);
-    bool paymentTransaction(const char* productId, const char* purchaseData, const char* signature, int purchaseState);
+    bool paymentTransaction(const char* productId,
+                            const char* purchaseData,
+                            const char* signature,
+                            int purchaseState);
 
 protected:
 
@@ -44,7 +44,15 @@ protected:
     static void BillingInitHandler(int error);
     static void PurchasedHandler(int result);
     static void ConsumeOwnItemtHandler(int result);
-    static void ConsumeHandler(int result);
+    static void successPurchase(const string& productId,
+                         const string& purchaseData,
+                         const string& signature,
+                         int purchaseState);
+    static void failedPurchase(const string& productId,
+                        int errorCode,
+                        const string& errorDescription,
+                        const string& purchaseData,
+                        const string& signature);
 
 private:
     InAppPurchaseManager() {};
