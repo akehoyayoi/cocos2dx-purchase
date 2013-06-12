@@ -23,11 +23,6 @@ bool PurchaseController::purchase(ProductInfo& productInfo){
 }
 
 bool PurchaseController::finishPurchase(){
-//    // consumeする
-//    PurchaseSuccessResultAndroid result = StorageManager::getInstance()->getPurchase();
-//    const char *purchaseData = result.purchaseData().c_str();
-//    const char *signature = result.signature().c_str();
-//    InAppPurchaseManager::getInstance().consume(purchaseData, signature);
     // レコード削除
     StorageManager::getInstance()->deletePurchase();
     return true;

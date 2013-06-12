@@ -10,7 +10,6 @@ NS_CC_PURCHASE_BEGIN
 
 CCString* InAppPurchaseManager::m_productId = NULL;
 int InAppPurchaseManager::m_price = 0;
-bool InAppPurchaseManager::m_retry = false;
 BillingServiceInit InAppPurchaseManager::m_init = BillingServiceDisconnected;
 
 InAppPurchaseManager& InAppPurchaseManager::getInstance()
@@ -19,13 +18,13 @@ InAppPurchaseManager& InAppPurchaseManager::getInstance()
    return _manager;
 }
 
+// 課金処理スタート
 bool InAppPurchaseManager::purchase(CCString * productId, int price)
 {
     CC_SAFE_RELEASE(m_productId);
     m_productId = productId;
     CC_SAFE_RETAIN(m_productId);
 	m_price = price;
-	m_retry = false;
 	StorageManager* storageManager = StorageManager::getInstance();
     PurchaseSuccessResultAndroid result = storageManager->getPurchase();
     int purchaseState = result.purchaseState();
@@ -44,11 +43,18 @@ bool InAppPurchaseManager::purchase(CCString * productId, int price)
 		m_init = BillingServiceConnecting;
 		GoogleBilling::Billing::init(InAppPurchaseManager::BillingInitHandler);
 	} else if(m_init == BillingServiceConnected) {
-		purchaseMain();
+		consume();
 	}
     return true;
 }
 
+// 消費処理
+void InAppPurchaseManager::consume()
+{
+    GoogleBilling::Billing::consumeOwnItem(m_productId->getCString(), InAppPurchaseManager::ConsumeOwnItemtHandler);    
+}
+
+// 課金処理メイン
 void InAppPurchaseManager::purchaseMain()
 {
 	if(m_init != BillingServiceConnected) return;
@@ -68,37 +74,12 @@ void InAppPurchaseManager::BillingInitHandler(int error)
 {
 	if (error == GoogleBilling::INIT_BILLING_YES) {
 		m_init = BillingServiceConnected;
-		CCLog("Billing initialised");
-		purchaseMain();
+		CCLOG("Billing initialised");
+		consume();
 	}
 	else if (error == GoogleBilling::INIT_BILLING_NO) {
 		m_init = BillingServiceDisconnected;
-		CCLog("Billing not availalble!");
-	}
-}
-
-// 課金処理のcallback
-void InAppPurchaseManager::PurchasedHandler(int result) {
-    string strProductId = m_productId->getCString();
-	if (result == GoogleBilling::PURCHASE_ALREADY_PURCHASED) {
-		CCLog("Shop:Item already purchased!");
-		if(!m_retry) {
-			m_retry = true;
-			GoogleBilling::Billing::consumeOwnItem(m_productId->getCString(), InAppPurchaseManager::ConsumeOwnItemtHandler);
-		} else {
-            CCLog("Shop: Purchase error!");
-            failedPurchase(strProductId, 99999, string("purchase failed"), string(""), string(""));
-        }
-	} else if (result == GoogleBilling::PURCHASE_USER_CANCELED) {
-		CCLog("Shop: Purchase user canceled!");
-	    // レコード削除
-	    StorageManager::getInstance()->deletePurchase();
-        failedPurchase(strProductId, 99999, string("user canceled"), string(""), string(""));
-	} else if (result == GoogleBilling::PURCHASE_FAIL) {
-		CCLog("Shop: Purchase failed!");
-        failedPurchase(strProductId, 99999, string("purchase failed"), string(""), string(""));
-	} else if (result == GoogleBilling::PURCHASE_SUCCESS) {
-		CCLog("Shop: Purchasing done");
+		CCLOG("Billing not availalble!");
 	}
 }
 
@@ -106,11 +87,33 @@ void InAppPurchaseManager::PurchasedHandler(int result) {
 void InAppPurchaseManager::ConsumeOwnItemtHandler(int result)
 {
 	if (result == GoogleBilling::CONSUME_SUCCESS) {
-		purchaseMain();
+        CCLOG("Consume success");
+	} else {
+        CCLOG("There is no need to be consume item");
+    }
+    purchaseMain();
+}
+
+// 課金処理のcallback
+void InAppPurchaseManager::PurchasedHandler(int result) {
+    string strProductId = m_productId->getCString();
+	if (result == GoogleBilling::PURCHASE_ALREADY_PURCHASED) {
+		CCLOG("Item already purchased!");
+        failedPurchase(strProductId, 99999, string("purchase failed"), string(""), string(""));
+	} else if (result == GoogleBilling::PURCHASE_USER_CANCELED) {
+		CCLOG("Purchase user canceled!");
+	    // レコード削除
+	    StorageManager::getInstance()->deletePurchase();
+        failedPurchase(strProductId, 99999, string("user canceled"), string(""), string(""));
+	} else if (result == GoogleBilling::PURCHASE_FAIL) {
+		CCLOG("Purchase failed!");
+        failedPurchase(strProductId, 99999, string("purchase failed"), string(""), string(""));
+	} else if (result == GoogleBilling::PURCHASE_SUCCESS) {
+		CCLOG("Purchasing done");
 	}
 }
 
-bool InAppPurchaseManager::paymentTransaction(const char* productId,
+void InAppPurchaseManager::paymentTransaction(const char* productId,
                                               const char* purchaseData,
                                               const char* signature,
                                               int purchaseState)
@@ -129,7 +132,6 @@ bool InAppPurchaseManager::paymentTransaction(const char* productId,
 	} else if(purchaseState == SKPaymentTransactionStateRestored) { // not support Non-Cosumable item
 		// do nothing
 	}
-    return true;
 }
 
 void InAppPurchaseManager::successPurchase(const string& productId,

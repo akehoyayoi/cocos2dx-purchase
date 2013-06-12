@@ -67,7 +67,7 @@ namespace GoogleBilling
         if (JniHelper::getStaticMethodInfo(t,
                                            "com/geishatokyo/purchase/GoogleBilling",
                                            "consumeOwnItem",
-                                           "(Ljava/lang/String;Ljava/lang/String;)V"))
+                                           "(Ljava/lang/String;J)V"))
         {
             jstring arg = t.env->NewStringUTF(productId);
             jlong arg2 = (long)(void*)callback;
@@ -87,16 +87,15 @@ extern "C"
 			(*reinterpret_cast<GoogleBilling::actionFinished>(callback_address))(error_code);
 	}
 
-    jboolean Java_com_geishatokyo_purchase_GoogleBilling_nativepaymentTransaction(JNIEnv* env, jobject thiz, jstring productId,
+    void Java_com_geishatokyo_purchase_GoogleBilling_nativepaymentTransaction(JNIEnv* env, jobject thiz, jstring productId,
     		                                                                      jstring purchaseData, jstring signature, jint state)
 	{
         const char *nativeProductId = env->GetStringUTFChars(productId, 0);
         const char *nativePurchaseData = env->GetStringUTFChars(purchaseData, 0);
         const char *nativeSignature = env->GetStringUTFChars(signature, 0);
-        jboolean ret = purchase::InAppPurchaseManager::getInstance().paymentTransaction(nativeProductId, nativePurchaseData, nativeSignature, state);
+        purchase::InAppPurchaseManager::getInstance().paymentTransaction(nativeProductId, nativePurchaseData, nativeSignature, state);
         env->ReleaseStringUTFChars(productId, nativeProductId);
         env->ReleaseStringUTFChars(purchaseData, nativePurchaseData);
         env->ReleaseStringUTFChars(signature, nativeSignature);
-        return ret;
 	}
 }
