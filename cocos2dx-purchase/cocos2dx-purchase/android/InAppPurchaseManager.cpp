@@ -32,9 +32,11 @@ bool InAppPurchaseManager::purchase(CCString * productId, int price)
 
     if(purchaseState == SKPaymentTransactionStatePurchased){
         EventHandlers::getInstance()->successPurchase(&result);
+        CC_SAFE_RELEASE_NULL(m_productId);
         CCLOG("previous purchase success");
         return true;
     } else if(purchaseState > 0) {
+        CC_SAFE_RELEASE_NULL(m_productId);
         CCLOG("previous purchase failed");
         return false;
     }
