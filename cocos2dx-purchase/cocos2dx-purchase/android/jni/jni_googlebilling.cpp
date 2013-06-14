@@ -77,6 +77,21 @@ namespace GoogleBilling
             t.env->DeleteLocalRef(t.classID);
         }
     }
+
+    void Billing::restoreReceipt(actionFinished callback)
+    {
+        JniMethodInfo t;
+        if (JniHelper::getStaticMethodInfo(t,
+                                           "com/geishatokyo/purchase/GoogleBilling",
+                                           "restoreReceipt",
+                                           "(J)V"))
+        {
+            jlong arg = (long)(void*)callback;
+            
+            t.env->CallStaticVoidMethod(t.classID, t.methodID, arg);
+            t.env->DeleteLocalRef(t.classID);
+        }
+    }
 }
 
 extern "C"

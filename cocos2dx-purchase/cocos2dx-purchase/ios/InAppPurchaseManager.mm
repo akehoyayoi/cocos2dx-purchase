@@ -43,11 +43,11 @@ USING_NS_CC_PURCHASE;
     [super dealloc];
 }
 
-- (BOOL)purchase:(NSString *) productId
+- (BOOL)checkPreviousPurchase:(BOOL*) check
 {
     // check transaction
     // if transaction is nothing then continuerous process
-    // success purchase transaction , success purchase process 
+    // success purchase transaction , success purchase process
     // other , exit process
     StorageManager* storageManager = StorageManager::getInstance();
     PurchaseSuccessResultIOS result = storageManager->getPurchase();
@@ -55,17 +55,29 @@ USING_NS_CC_PURCHASE;
     if(transactionState == SKPaymentTransactionStatePurchased){
         EventHandlers::getInstance()->successPurchase(&result);
         CCLOG("previous purchase success");
+        *check = YES;
         return YES;
     } else if(transactionState > 0) {
         CCLOG("previous purchase failed");
-        return NO;
+        *check = NO;
+        return YES;
     }
+    return NO;
+}
 
+- (BOOL)purchase:(NSString *) productId
+{
+    BOOL check = NO;
+    if([self checkPreviousPurchase: &check]) {
+        return check;
+    }
+    
     if([SKPaymentQueue canMakePayments] == NO) {
         return NO;
     }
     
     // record transaction for duplicate payment
+    StorageManager* storageManager = StorageManager::getInstance();
     string product_id([productId UTF8String]);
     string transaction_id("");
     string transaction_receipt("");

@@ -15,6 +15,8 @@
 
 + (InAppPurchaseManager*)getInstance;
 
+- (BOOL)checkPreviousPurchase:(BOOL*) check;
+
 - (BOOL)purchase:(NSString *) productId;
 
 @end

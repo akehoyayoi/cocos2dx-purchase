@@ -33,6 +33,7 @@ class InAppPurchaseManager
 public:
     static InAppPurchaseManager& getInstance();
     bool purchase(CCString * productId, int price);
+    bool checkPreviousPurchase(bool *check);
     void paymentTransaction(const char* productId,
                             const char* purchaseData,
                             const char* signature,
@@ -42,9 +43,11 @@ protected:
 
     static void purchaseMain();
     static void consume();
+    static void restoreReceipt();
     static void BillingInitHandler(int error);
     static void PurchasedHandler(int result);
     static void ConsumeOwnItemtHandler(int result);
+    static void RestoreReceiptHandler(int result);
     static void successPurchase(const string& productId,
                          const string& purchaseData,
                          const string& signature,
@@ -62,6 +65,7 @@ private:
     static CCString* m_productId;
     static int m_price;
     static BillingServiceInit m_init;
+    static void (*m_next)(void);
 
     InAppPurchaseManager(const InAppPurchaseManager&);
     InAppPurchaseManager& operator=(const InAppPurchaseManager&);

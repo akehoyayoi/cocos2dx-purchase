@@ -11,6 +11,7 @@ NS_CC_PURCHASE_BEGIN
 CCString* InAppPurchaseManager::m_productId = NULL;
 int InAppPurchaseManager::m_price = 0;
 BillingServiceInit InAppPurchaseManager::m_init = BillingServiceDisconnected;
+void (*InAppPurchaseManager::m_next)(void) = NULL;
 
 InAppPurchaseManager& InAppPurchaseManager::getInstance()
 {
@@ -18,13 +19,8 @@ InAppPurchaseManager& InAppPurchaseManager::getInstance()
    return _manager;
 }
 
-// 課金処理スタート
-bool InAppPurchaseManager::purchase(CCString * productId, int price)
+bool InAppPurchaseManager::checkPreviousPurchase(bool *check)
 {
-    CC_SAFE_RELEASE(m_productId);
-    m_productId = productId;
-    CC_SAFE_RETAIN(m_productId);
-	m_price = price;
 	StorageManager* storageManager = StorageManager::getInstance();
     PurchaseSuccessResultAndroid result = storageManager->getPurchase();
     int purchaseState = result.purchaseState();
@@ -32,17 +28,41 @@ bool InAppPurchaseManager::purchase(CCString * productId, int price)
 
     if(purchaseState == SKPaymentTransactionStatePurchased){
         EventHandlers::getInstance()->successPurchase(&result);
-        CC_SAFE_RELEASE_NULL(m_productId);
         CCLOG("previous purchase success");
+        *check = true;
         return true;
     } else if(purchaseState > 0) {
-        CC_SAFE_RELEASE_NULL(m_productId);
+        // 購入情報が残っていれば、レシートを再作成
         CCLOG("previous purchase failed");
-        return false;
+        if(m_init == BillingServiceDisconnected) {
+            m_init = BillingServiceConnecting;
+            m_next = &InAppPurchaseManager::restoreReceipt;
+            GoogleBilling::Billing::init(InAppPurchaseManager::BillingInitHandler);
+        } else if(m_init == BillingServiceConnected) {
+            restoreReceipt();
+        }
+        *check = true;
+        return true;
     }
+    return false;
+}
+
+// 課金処理スタート
+bool InAppPurchaseManager::purchase(CCString * productId, int price)
+{
+    bool check = false;
+    if(checkPreviousPurchase(&check)) {
+        return check;
+    }
+
+    CC_SAFE_RELEASE(m_productId);
+    m_productId = productId;
+    CC_SAFE_RETAIN(m_productId);
+	m_price = price;
 
     if(m_init == BillingServiceDisconnected) {
 		m_init = BillingServiceConnecting;
+        m_next = &InAppPurchaseManager::consume;
 		GoogleBilling::Billing::init(InAppPurchaseManager::BillingInitHandler);
 	} else if(m_init == BillingServiceConnected) {
 		consume();
@@ -50,10 +70,16 @@ bool InAppPurchaseManager::purchase(CCString * productId, int price)
     return true;
 }
 
+// レシート再作成処理
+void InAppPurchaseManager::restoreReceipt()
+{
+    GoogleBilling::Billing::restoreReceipt(InAppPurchaseManager::RestoreReceiptHandler);
+}
+
 // 消費処理
 void InAppPurchaseManager::consume()
 {
-    GoogleBilling::Billing::consumeOwnItem(m_productId->getCString(), InAppPurchaseManager::ConsumeOwnItemtHandler);    
+    GoogleBilling::Billing::consumeOwnItem(m_productId->getCString(), InAppPurchaseManager::ConsumeOwnItemtHandler);
 }
 
 // 課金処理メイン
@@ -77,7 +103,8 @@ void InAppPurchaseManager::BillingInitHandler(int error)
 	if (error == GoogleBilling::INIT_BILLING_YES) {
 		m_init = BillingServiceConnected;
 		CCLOG("Billing initialised");
-		consume();
+		//consume();
+        if(m_next) (*m_next)();
 	}
 	else if (error == GoogleBilling::INIT_BILLING_NO) {
 		m_init = BillingServiceDisconnected;
@@ -113,6 +140,14 @@ void InAppPurchaseManager::PurchasedHandler(int result) {
 	} else if (result == GoogleBilling::PURCHASE_SUCCESS) {
 		CCLOG("Purchasing done");
 	}
+}
+
+void InAppPurchaseManager::RestoreReceiptHandler(int result) {
+	if (result == GoogleBilling::CONSUME_SUCCESS) {
+        CCLOG("restore receipt success");
+	} else {
+        CCLOG("restore receipt failed");
+    }
 }
 
 void InAppPurchaseManager::paymentTransaction(const char* productId,

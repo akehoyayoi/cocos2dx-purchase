@@ -16,6 +16,14 @@ NS_CC_PURCHASE_BEGIN
 
 PurchaseController* PurchaseController::m_instance = NULL;
 
+bool PurchaseController::checkPreviousPurchase(){
+    bool check = false;
+    if(InAppPurchaseManager::getInstance().checkPreviousPurchase(&check)) {
+        return check;
+    }
+    return true;
+}
+
 bool PurchaseController::purchase(ProductInfo& productInfo){
     CCString* productId = ccs(productInfo.productId().c_str());
     int price = productInfo.price();
