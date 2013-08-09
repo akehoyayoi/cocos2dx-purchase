@@ -16,7 +16,7 @@ CCString* getDatabaseFilePath(CCString* prefix)
 {
     CCFileUtils* pUtils = CCFileUtils::sharedFileUtils();
     const char* dbPath = prefix->length() == 0 ? DBPATH: CCString::createWithFormat("%s_%s", prefix->getCString(), DBPATH)->getCString();
-    std::string documentsDir = pUtils->getWritablePath();
+    std::string documentsDir = pUtils->getWritablePath(false);
     return CCString::createWithFormat("%s%s", documentsDir.c_str(), dbPath);
 }
 
