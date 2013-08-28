@@ -50,15 +50,15 @@ bool InAppPurchaseManager::checkPreviousPurchase(bool *check)
 // 課金処理スタート
 bool InAppPurchaseManager::purchase(CCString * productId, int price)
 {
-    bool check = false;
-    if(checkPreviousPurchase(&check)) {
-        return check;
-    }
-
     CC_SAFE_RELEASE(m_productId);
     m_productId = productId;
     CC_SAFE_RETAIN(m_productId);
 	m_price = price;
+
+    bool check = false;
+    if(this->checkPreviousPurchase(&check)) {
+        return check;
+    }
 
     if(m_init == BillingServiceDisconnected) {
 		m_init = BillingServiceConnecting;
@@ -143,10 +143,13 @@ void InAppPurchaseManager::PurchasedHandler(int result) {
 }
 
 void InAppPurchaseManager::RestoreReceiptHandler(int result) {
-	if (result == GoogleBilling::CONSUME_SUCCESS) {
+	if (result == GoogleBilling::RESTORERECEIPT_SUCCESS) {
         CCLOG("restore receipt success");
 	} else {
         CCLOG("restore receipt failed");
+        // 課金処理を続行
+        StorageManager::getInstance()->deletePurchase();
+        consume();
     }
 }
 

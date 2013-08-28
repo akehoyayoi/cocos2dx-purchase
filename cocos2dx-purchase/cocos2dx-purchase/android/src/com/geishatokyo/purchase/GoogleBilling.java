@@ -1,5 +1,7 @@
 package com.geishatokyo.purchase;
 
+import java.util.List;
+
 import org.json.JSONException;
 
 import android.app.Activity;
@@ -32,6 +34,8 @@ public class GoogleBilling extends Activity {
 	public static int PURCHASE_USER_CANCELED =5;
 	public static int CONSUME_SUCCESS = 6;
 	public static int CONSUME_FAIL = 7;
+	public static int RESTORERECEIPT_SUCCESS = 8;
+	public static int RESTORERECEIPT_FAIL = 9;
 
     // Item types
     public static final String ITEM_TYPE_INAPP = "inapp";
@@ -46,7 +50,18 @@ public class GoogleBilling extends Activity {
 
 	private static native boolean nativepaymentTransaction(String sku, String purchaseData,
 			                                               String signature, int state);
-    /*
+
+	private static void paymentTransaction(final String sku, final String purchaseData,
+			final String signature, final int state) {
+		mGLSurfaceView.queueEvent(new Runnable() {
+			@Override
+			public void run() {
+				nativepaymentTransaction(sku, purchaseData, signature, state);
+			}
+		});
+	}
+
+	/*
 	 * Initialize GoogleBilling.
 	 */
 	public static boolean init(final long callback_address) {
@@ -57,27 +72,31 @@ public class GoogleBilling extends Activity {
 			nativeactionFinished(callback_address, INIT_BILLING_NO);
 			return false;
 		}
-		mHelper = new IabHelper(mActivity);
-		// Remove before release
-		mHelper.enableDebugLogging(true);
+		mActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				mHelper = new IabHelper(mActivity);
+				// Remove before release
+				mHelper.enableDebugLogging(true);
 
-		mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
-			public void onIabSetupFinished(final IabResult result) {
-				if (isDebug) {
-					Log.d(TAG, "Result:" + result);
-				}
+				mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+					public void onIabSetupFinished(final IabResult result) {
+						if (isDebug) {
+							Log.d(TAG, "Result:" + result);
+						}
 
-				int resultMessage = INIT_BILLING_NO;
-				if (result.isSuccess()) {
-					bSupport = true;
-					resultMessage = INIT_BILLING_YES;
-	                Log.d(TAG, "Setup successful. Querying inventory.");
-				} else {
-					bSupport = false;
-					Log.e(TAG, "Problem setting up in-app billing: " + result);
-				}
-				nativeactionFinished(callback_address, resultMessage);
-//				consumeAll();
+						int resultMessage = INIT_BILLING_NO;
+						if (result.isSuccess()) {
+							bSupport = true;
+							resultMessage = INIT_BILLING_YES;
+							Log.d(TAG, "Setup successful. Querying inventory.");
+						} else {
+							bSupport = false;
+							Log.e(TAG, "Problem setting up in-app billing: " + result);
+						}
+						nativeactionFinished(callback_address, resultMessage);
+					}
+				});
 			}
 		});
 		return true;
@@ -85,23 +104,28 @@ public class GoogleBilling extends Activity {
 
 	public static void consumeOwnItem(final String productId, final long callback_address)
 	{
-        mHelper.queryInventoryAsync(false, new IabHelper.QueryInventoryFinishedListener()
-        {
-        	public void onQueryInventoryFinished(IabResult result, Inventory inventory)
-        	{
-	            Log.d(TAG, "Query inventory finished.");
-	            if (result.isFailure()) {
-	                Log.e(TAG, "Failed to query inventory: " + result);
-	                return;
-	            }
+		mActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				mHelper.queryInventoryAsync(false, new IabHelper.QueryInventoryFinishedListener()
+				{
+					public void onQueryInventoryFinished(IabResult result, Inventory inventory)
+					{
+						Log.d(TAG, "Query inventory finished.");
+						if (result.isFailure()) {
+							Log.e(TAG, "Failed to query inventory: " + result);
+							return;
+						}
 
-	            Log.d(TAG, "Query inventory was successful.");
+						Log.d(TAG, "Query inventory was successful.");
 
-	            Purchase purchase = inventory.getPurchase(productId);
-	            if(purchase != null) consumePurchase(purchase, callback_address);
-	            else nativeactionFinished(callback_address,GoogleBilling.CONSUME_FAIL);
-        	}
-        });
+						Purchase purchase = inventory.getPurchase(productId);
+						if(purchase != null) consumePurchase(purchase, callback_address);
+						else nativeactionFinished(callback_address,GoogleBilling.CONSUME_FAIL);
+					}
+				});
+			}
+		});
     };
 
 	/*
@@ -128,24 +152,12 @@ public class GoogleBilling extends Activity {
 									if (isDebug) {
 										Log.d(TAG, "Purchase success");
 									}
-									resultMsg = GoogleBilling.PURCHASE_SUCCESS;
-									boolean ret = false;
-//									try {
-//										String purchaseData = URLEncoder.encode(purchase.getOriginalJson(), "UTF-8");
-//										String signature = URLEncoder.encode(purchase.getSignature(), "UTF-8");
-
-//										ret = nativepaymentTransaction(purchase.getSku(),
-//												                       purchaseData,
-//                                                                       signature,
-//                                                                       purchase.getPurchaseState());
-										ret = nativepaymentTransaction(purchase.getSku(),
-							                       purchase.getOriginalJson(),
-                                                purchase.getSignature(),
-                                                purchase.getPurchaseState());
-//									} catch (UnsupportedEncodingException e) {
-//										e.printStackTrace();
-//									}
-									consumePurchase(purchase);
+									//resultMsg = GoogleBilling.PURCHASE_SUCCESS;
+									paymentTransaction(purchase.getSku(),
+							                           purchase.getOriginalJson(),
+                                                       purchase.getSignature(),
+                                                       purchase.getPurchaseState());
+									return;
 								}
 								if (result.getResponse() == IabHelper.IABHELPER_USER_CANCELLED) {
 									resultMsg = GoogleBilling.PURCHASE_USER_CANCELED;
@@ -167,19 +179,13 @@ public class GoogleBilling extends Activity {
 	{
         Purchase purchase = null;
         try {
-//        	String data = URLDecoder.decode(purchaseData, "UTF-8");
-//        	String signature = URLDecoder.decode(dataSignature, "UTF-8");
-//        	purchase = new Purchase(ITEM_TYPE_INAPP, data, signature);
         	purchase = new Purchase(ITEM_TYPE_INAPP, purchaseData, dataSignature);
         }
         catch (JSONException e) {
             Log.e(TAG, "Failed to parse purchase data.");
             e.printStackTrace();
-//        } catch (UnsupportedEncodingException e) {
-//			e.printStackTrace();
 		}
-        consumePurchase(purchase);
-//        consumePurchase(purchase, callback_address);
+        consumePurchase(purchase, callback_address);
 	}
 
 	/*
@@ -191,31 +197,71 @@ public class GoogleBilling extends Activity {
         if (isDebug) {
 			Log.d(TAG, "Trying to consume item:" + purchase.getSku());
 		}
-
-		mHelper.consumeAsync(purchase,new IabHelper.OnConsumeFinishedListener()
-		{
-			public void onConsumeFinished(Purchase purchase, IabResult result)
-			{
-				if (result.isSuccess()) {
-					if (isDebug)
+		mActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				mHelper.consumeAsync(purchase,new IabHelper.OnConsumeFinishedListener()
+				{
+					public void onConsumeFinished(Purchase purchase, IabResult result)
 					{
-						Log.d(TAG,"Consumed item:" + purchase.getSku());
-					}
-					if(callback_address > 0) {
-						nativeactionFinished(callback_address,GoogleBilling.CONSUME_SUCCESS);
-					}
-					return;
-				} else {
-					mGLSurfaceView.queueEvent(new Runnable() {
-						@Override
-						public void run()
-						{
+						if (result.isSuccess()) {
+							if (isDebug)
+							{
+								Log.d(TAG,"Consumed item:" + purchase.getSku());
+							}
+							if(callback_address > 0) {
+								nativeactionFinished(callback_address,GoogleBilling.CONSUME_SUCCESS);
+							}
+							return;
+						} else {
 							if(callback_address > 0) {
 								nativeactionFinished(callback_address,GoogleBilling.CONSUME_FAIL);
 							}
 						}
-					});
-				}
+					}
+				});
+			}
+		});
+	}
+
+	public static void restoreReceipt(final long callback_address) {
+		if (isDebug) {
+			Log.d(TAG, "Trying to restore receipt");
+		}
+		mActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				mHelper.queryInventoryAsync(false, new IabHelper.QueryInventoryFinishedListener()
+				{
+					public void onQueryInventoryFinished(IabResult result, Inventory inventory)
+					{
+						Log.d(TAG, "Query inventory finished.");
+						if (result.isFailure()) {
+							Log.e(TAG, "Failed to query inventory: " + result);
+							return;
+						}
+
+						Log.d(TAG, "Query inventory was successful.");
+
+						List<Purchase> purchaseList = inventory.getAllPurchases();
+                        if(!purchaseList.isEmpty()) {
+                            Purchase purchase = purchaseList.get(0);
+
+                            if(purchase != null) {
+                                paymentTransaction(purchase.getSku(),
+                                                   purchase.getOriginalJson(),
+                                                   purchase.getSignature(),
+                                                   purchase.getPurchaseState());
+                                nativeactionFinished(callback_address,GoogleBilling.RESTORERECEIPT_SUCCESS);
+                            } else {
+                                nativeactionFinished(callback_address,GoogleBilling.RESTORERECEIPT_FAIL);
+                            }
+                        } else {
+                            Log.d(TAG, "There is no purchase info in inventory.");
+                            nativeactionFinished(callback_address,GoogleBilling.RESTORERECEIPT_FAIL);
+                        }
+					}
+				});
 			}
 		});
 	}
