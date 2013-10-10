@@ -19,7 +19,7 @@ InAppPurchaseManager& InAppPurchaseManager::getInstance()
    return _manager;
 }
 
-bool InAppPurchaseManager::checkPreviousPurchase(bool *check)
+bool InAppPurchaseManager::checkPreviousPurchase(bool *success)
 {
 	StorageManager* storageManager = StorageManager::getInstance();
     PurchaseSuccessResultAndroid result = storageManager->getPurchase();
@@ -29,7 +29,7 @@ bool InAppPurchaseManager::checkPreviousPurchase(bool *check)
     if(purchaseState == SKPaymentTransactionStatePurchased){
         EventHandlers::getInstance()->successPurchase(&result);
         CCLOG("previous purchase success");
-        *check = true;
+        *success = true;
         return true;
     } else if(purchaseState > 0) {
         // 購入情報が残っていれば、レシートを再作成
@@ -41,7 +41,7 @@ bool InAppPurchaseManager::checkPreviousPurchase(bool *check)
         } else if(m_init == BillingServiceConnected) {
             restoreReceipt();
         }
-        *check = true;
+        *success = false;
         return true;
     }
     return false;
