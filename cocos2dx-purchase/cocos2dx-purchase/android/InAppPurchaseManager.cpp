@@ -149,7 +149,13 @@ void InAppPurchaseManager::RestoreReceiptHandler(int result) {
         CCLOG("restore receipt failed");
         // 課金処理を続行
         StorageManager::getInstance()->deletePurchase();
-        if(m_productId) consume();
+        if(m_productId) {
+            CCLOG("continu to consume");
+            consume();
+        } else {
+            CCLOG("productId is null");
+            failedPurchase(string(""), 99999, string("purchase failed"), string(""), string(""));
+        }
     }
 }
 
