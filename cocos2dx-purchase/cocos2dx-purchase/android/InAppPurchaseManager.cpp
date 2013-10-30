@@ -34,6 +34,10 @@ bool InAppPurchaseManager::checkPreviousPurchase(bool *success)
     } else if(purchaseState > 0) {
         // 購入情報が残っていれば、レシートを再作成
         CCLOG("previous purchase failed");
+        CC_SAFE_RELEASE(m_productId);
+        m_productId = ccs(result.productId().c_str());
+        CC_SAFE_RETAIN(m_productId);
+        
         if(m_init == BillingServiceDisconnected) {
             m_init = BillingServiceConnecting;
             m_next = &InAppPurchaseManager::restoreReceipt;
