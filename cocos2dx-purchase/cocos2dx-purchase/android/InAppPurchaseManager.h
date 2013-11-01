@@ -33,7 +33,7 @@ class InAppPurchaseManager
 public:
     static InAppPurchaseManager& getInstance();
     bool purchase(CCString * productId, int price);
-    bool checkPreviousPurchase(bool *check);
+    bool checkPreviousPurchase(bool *success);
     void paymentTransaction(const char* productId,
                             const char* purchaseData,
                             const char* signature,

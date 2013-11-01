@@ -43,7 +43,7 @@ USING_NS_CC_PURCHASE;
     [super dealloc];
 }
 
-- (BOOL)checkPreviousPurchase:(BOOL*) check
+- (BOOL)checkPreviousPurchase:(BOOL*) success
 {
     // check transaction
     // if transaction is nothing then continuerous process
@@ -55,11 +55,11 @@ USING_NS_CC_PURCHASE;
     if(transactionState == SKPaymentTransactionStatePurchased){
         EventHandlers::getInstance()->successPurchase(&result);
         CCLOG("previous purchase success");
-        *check = YES;
+        *success = YES;
         return YES;
     } else if(transactionState > 0) {
         CCLOG("previous purchase failed");
-        *check = NO;
+        *success = NO;
         return YES;
     }
     return NO;

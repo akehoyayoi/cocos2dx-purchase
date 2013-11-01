@@ -16,12 +16,8 @@ NS_CC_PURCHASE_BEGIN
 
 PurchaseController* PurchaseController::m_instance = NULL;
 
-bool PurchaseController::checkPreviousPurchase(){
-    bool check = false;
-    if(InAppPurchaseManager::getInstance().checkPreviousPurchase(&check)) {
-        return check;
-    }
-    return true;
+bool PurchaseController::checkPreviousPurchase(bool* success){
+    return InAppPurchaseManager::getInstance().checkPreviousPurchase(success);
 }
 
 bool PurchaseController::purchase(ProductInfo& productInfo){

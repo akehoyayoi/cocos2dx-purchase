@@ -19,7 +19,7 @@ InAppPurchaseManager& InAppPurchaseManager::getInstance()
    return _manager;
 }
 
-bool InAppPurchaseManager::checkPreviousPurchase(bool *check)
+bool InAppPurchaseManager::checkPreviousPurchase(bool *success)
 {
 	StorageManager* storageManager = StorageManager::getInstance();
     PurchaseSuccessResultAndroid result = storageManager->getPurchase();
@@ -29,11 +29,15 @@ bool InAppPurchaseManager::checkPreviousPurchase(bool *check)
     if(purchaseState == SKPaymentTransactionStatePurchased){
         EventHandlers::getInstance()->successPurchase(&result);
         CCLOG("previous purchase success");
-        *check = true;
+        *success = true;
         return true;
     } else if(purchaseState > 0) {
         // 購入情報が残っていれば、レシートを再作成
         CCLOG("previous purchase failed");
+        CC_SAFE_RELEASE(m_productId);
+        m_productId = ccs(result.productId().c_str());
+        CC_SAFE_RETAIN(m_productId);
+        
         if(m_init == BillingServiceDisconnected) {
             m_init = BillingServiceConnecting;
             m_next = &InAppPurchaseManager::restoreReceipt;
@@ -41,7 +45,7 @@ bool InAppPurchaseManager::checkPreviousPurchase(bool *check)
         } else if(m_init == BillingServiceConnected) {
             restoreReceipt();
         }
-        *check = true;
+        *success = false;
         return true;
     }
     return false;
@@ -149,7 +153,13 @@ void InAppPurchaseManager::RestoreReceiptHandler(int result) {
         CCLOG("restore receipt failed");
         // 課金処理を続行
         StorageManager::getInstance()->deletePurchase();
-        if(m_productId) consume();
+        if(m_productId) {
+            CCLOG("continu to consume");
+            consume();
+        } else {
+            CCLOG("productId is null");
+            failedPurchase(string(""), 99999, string("purchase failed"), string(""), string(""));
+        }
     }
 }
 

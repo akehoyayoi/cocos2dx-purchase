@@ -29,7 +29,7 @@ public:
         return m_instance;
     }
     
-    bool checkPreviousPurchase();
+    bool checkPreviousPurchase(bool* success);
     bool purchase(ProductInfo& productIndo);
     
     bool finishPurchase();
