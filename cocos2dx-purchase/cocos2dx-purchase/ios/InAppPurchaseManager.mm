@@ -10,7 +10,7 @@
 #import "NSData+Base64.h"
 #include "EventHandlers.h"
 #include "PurchaseMacros.h"
-#include "StorageManager.h"
+#include "StorageManagerIOS.h"
 #include <string>
 
 #ifndef SAFE_RELEASE
@@ -43,29 +43,46 @@ USING_NS_CC_PURCHASE;
     [super dealloc];
 }
 
-- (BOOL)purchase:(NSString *) productId
+- (BOOL)checkPreviousPurchase:(BOOL*) success
 {
     // check transaction
     // if transaction is nothing then continuerous process
-    // success purchase transaction , success purchase process 
+    // success purchase transaction , success purchase process
     // other , exit process
     StorageManager* storageManager = StorageManager::getInstance();
-    PurchaseSuccessResult result = storageManager->getPurchase();
+    PurchaseSuccessResultIOS result = storageManager->getPurchase();
     int transactionState = result.transactionState();
     if(transactionState == SKPaymentTransactionStatePurchased){
-        EventHandlers::getInstance()->successPurchase(result);
+        EventHandlers::getInstance()->successPurchase(&result);
         CCLOG("previous purchase success");
+        *success = YES;
         return YES;
     } else if(transactionState > 0) {
         CCLOG("previous purchase failed");
-        return NO;
+        *success = NO;
+        return YES;
     }
+    return NO;
+}
 
-    if([SKPaymentQueue canMakePayments] == NO) {
-        return NO;
+- (PurchaseResultCode)purchase:(NSString *) productId
+{
+    BOOL check = NO;
+    if([self checkPreviousPurchase: &check]) {
+        return check ? kPurchasePreviousSuccess : kPurchasePreviousFailed;
     }
     
+    // アプリ内課金が許可されているかを確認
+    if([SKPaymentQueue canMakePayments] == NO) {
+        // アラートを表示
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"アプリ内課金が許可されていません。" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        [alert release];
+        return kPurchaseCanNotMakePayments;
+    }
+
     // record transaction for duplicate payment
+    StorageManager* storageManager = StorageManager::getInstance();
     string product_id([productId UTF8String]);
     string transaction_id("");
     string transaction_receipt("");
@@ -79,7 +96,7 @@ USING_NS_CC_PURCHASE;
     productRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithObject:productId]];
     productRequest.delegate = self;
     [productRequest start];
-    return YES;
+    return kPurchaseSuccess;
 }
 
 - (void) productsRequest:(SKProductsRequest *)request
@@ -87,14 +104,14 @@ USING_NS_CC_PURCHASE;
 {
 
     if(response == nil){
-        PurchaseFailedResult result(string("") , string("") , 0 , 99999 , string("invalid response"));
-        EventHandlers::getInstance()->failedPurchase(result);
+        PurchaseFailedResultIOS result(string("") , string("") , 0 , 99999 , string("invalid response"));
+        EventHandlers::getInstance()->failedPurchase(&result);
         return;
     }
     
     if([[response products] count] == 0){
-        PurchaseFailedResult result(string("") , string("") , 0 , 99999 , string("valid product is nothing"));
-        EventHandlers::getInstance()->failedPurchase(result);
+        PurchaseFailedResultIOS result(string("") , string("") , 0 , 99999 , string("valid product is nothing"));
+        EventHandlers::getInstance()->failedPurchase(&result);
         return;
     }
     
@@ -132,11 +149,11 @@ USING_NS_CC_PURCHASE;
                                                              transactionId,
                                                              transactionState,
                                                              transationReceipt);
-                PurchaseSuccessResult result(productId,
+                PurchaseSuccessResultIOS result(productId,
                                              transactionId,
                                              transactionState,
                                              transationReceipt,0);
-                EventHandlers::getInstance()->successPurchase(result);
+                EventHandlers::getInstance()->successPurchase(&result);
                 break;
             }
             case SKPaymentTransactionStateFailed: // failed purchase
@@ -144,12 +161,12 @@ USING_NS_CC_PURCHASE;
                 [queue finishTransaction:transaction];
                 int errorCode = [[transaction error] code];
                 string errorDescription([[[transaction error] localizedDescription] UTF8String]);
-                PurchaseFailedResult result(productId,
+                PurchaseFailedResultIOS result(productId,
                                             transactionId,
                                             transactionState,
                                             errorCode,
                                             errorDescription);
-                EventHandlers::getInstance()->failedPurchase(result);
+                EventHandlers::getInstance()->failedPurchase(&result);
                 break;
             }
             case SKPaymentTransactionStateRestored: // not support Non-Cosumable item

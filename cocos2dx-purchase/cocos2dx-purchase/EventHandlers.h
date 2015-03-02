@@ -17,8 +17,8 @@ NS_CC_PURCHASE_BEGIN
 
 class IEventHandler {
 public:
-    virtual void successPurchase(PurchaseSuccessResult& purchaseResult) = 0;
-    virtual void failedPurchase(PurchaseFailedResult& purchaseResult) = 0;
+    virtual void successPurchase(PurchaseSuccessResult* purchaseResult) = 0;
+    virtual void failedPurchase(PurchaseFailedResult* purchaseResult) = 0;
 };
 
 class EventHandlers {
@@ -34,8 +34,8 @@ public:
 	void removeHandler(IEventHandler* handler);
     
     // this method is called by cocos2dx-purchase
-    void successPurchase(PurchaseSuccessResult& purchaseResult);
-    void failedPurchase(PurchaseFailedResult& purchaseResult);
+    void successPurchase(PurchaseSuccessResult* purchaseResult);
+    void failedPurchase(PurchaseFailedResult* purchaseResult);
     
 private:
     static EventHandlers* m_instace;

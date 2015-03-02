@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <StoreKit/StoreKit.h>
+#import "PurchaseResultCode.h"
 
 @interface InAppPurchaseManager  : NSObject<SKProductsRequestDelegate,SKPaymentTransactionObserver>{
     SKProductsRequest *productRequest;
@@ -15,6 +16,8 @@
 
 + (InAppPurchaseManager*)getInstance;
 
-- (BOOL)purchase:(NSString *) productId;
+- (BOOL)checkPreviousPurchase:(BOOL*) check;
+
+- (PurchaseResultCode)purchase:(NSString *) productId;
 
 @end

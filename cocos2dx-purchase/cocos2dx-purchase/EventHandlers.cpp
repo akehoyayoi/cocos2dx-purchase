@@ -20,13 +20,13 @@ void EventHandlers::removeHandler(IEventHandler* handler) {
 	handlers.erase(handler);
 }
 
-void EventHandlers::successPurchase(PurchaseSuccessResult& purchaseResult){
+void EventHandlers::successPurchase(PurchaseSuccessResult* purchaseResult){
 	set<IEventHandler*>::iterator itr;
 	for ( itr = handlers.begin(); itr != handlers.end(); itr++ )
 	    (*itr)->successPurchase(purchaseResult);
 }
 
-void EventHandlers::failedPurchase(PurchaseFailedResult& purchaseResult) {
+void EventHandlers::failedPurchase(PurchaseFailedResult* purchaseResult) {
 	set<IEventHandler*>::iterator itr;
 	for ( itr = handlers.begin(); itr != handlers.end(); itr++ )
 	    (*itr)->failedPurchase(purchaseResult);

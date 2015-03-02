@@ -9,13 +9,17 @@
 #include "PurchaseController.h"
 
 #import "InAppPurchaseManager.h"
-#include "StorageManager.h"
+#include "StorageManagerIOS.h"
 
 NS_CC_PURCHASE_BEGIN
 
 PurchaseController* PurchaseController::m_instance = NULL;
 
-bool PurchaseController::purchase(ProductInfo& productIndo){
+bool PurchaseController::checkPreviousPurchase(bool* success){
+    return [[InAppPurchaseManager getInstance] checkPreviousPurchase: (BOOL*)success];
+}
+    
+PurchaseResultCode PurchaseController::purchase(ProductInfo& productIndo){
     NSString* productId = [[NSString alloc] initWithUTF8String:productIndo.productId().c_str()];
     return [[InAppPurchaseManager getInstance] purchase:productId];
 }
