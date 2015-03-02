@@ -19,7 +19,7 @@ bool PurchaseController::checkPreviousPurchase(bool* success){
     return [[InAppPurchaseManager getInstance] checkPreviousPurchase: (BOOL*)success];
 }
     
-bool PurchaseController::purchase(ProductInfo& productIndo){
+PurchaseResultCode PurchaseController::purchase(ProductInfo& productIndo){
     NSString* productId = [[NSString alloc] initWithUTF8String:productIndo.productId().c_str()];
     return [[InAppPurchaseManager getInstance] purchase:productId];
 }

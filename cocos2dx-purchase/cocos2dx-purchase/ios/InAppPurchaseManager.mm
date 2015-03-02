@@ -65,17 +65,22 @@ USING_NS_CC_PURCHASE;
     return NO;
 }
 
-- (BOOL)purchase:(NSString *) productId
+- (PurchaseResultCode)purchase:(NSString *) productId
 {
     BOOL check = NO;
     if([self checkPreviousPurchase: &check]) {
-        return check;
+        return check ? kPurchasePreviousSuccess : kPurchasePreviousFailed;
     }
     
+    // アプリ内課金が許可されているかを確認
     if([SKPaymentQueue canMakePayments] == NO) {
-        return NO;
+        // アラートを表示
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"" message:@"アプリ内課金が許可されていません。" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        [alert release];
+        return kPurchaseCanNotMakePayments;
     }
-    
+
     // record transaction for duplicate payment
     StorageManager* storageManager = StorageManager::getInstance();
     string product_id([productId UTF8String]);
@@ -91,7 +96,7 @@ USING_NS_CC_PURCHASE;
     productRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithObject:productId]];
     productRequest.delegate = self;
     [productRequest start];
-    return YES;
+    return kPurchaseSuccess;
 }
 
 - (void) productsRequest:(SKProductsRequest *)request

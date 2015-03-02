@@ -10,6 +10,8 @@
 
 #include "cocos2d.h"
 #include "PurchaseMacros.h"
+#include "ProductInfo.h"
+#include "PurchaseResultCode.h"
 
 using namespace std;
 
@@ -32,7 +34,7 @@ class InAppPurchaseManager
 {
 public:
     static InAppPurchaseManager& getInstance();
-    bool purchase(CCString * productId, int price);
+    PurchaseResultCode purchase(CCString * productId, int price);
     bool checkPreviousPurchase(bool *success);
     void paymentTransaction(const char* productId,
                             const char* purchaseData,

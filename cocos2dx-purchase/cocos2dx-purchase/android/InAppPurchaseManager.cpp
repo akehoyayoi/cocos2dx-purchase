@@ -52,7 +52,7 @@ bool InAppPurchaseManager::checkPreviousPurchase(bool *success)
 }
 
 // 課金処理スタート
-bool InAppPurchaseManager::purchase(CCString * productId, int price)
+PurchaseResultCode InAppPurchaseManager::purchase(CCString * productId, int price)
 {
     CC_SAFE_RELEASE(m_productId);
     m_productId = productId;
@@ -61,7 +61,7 @@ bool InAppPurchaseManager::purchase(CCString * productId, int price)
 
     bool check = false;
     if(this->checkPreviousPurchase(&check)) {
-        return check;
+        return check ? kPurchasePreviousSuccess : kPurchasePreviousFailed;
     }
 
     if(m_init == BillingServiceDisconnected) {
@@ -71,7 +71,7 @@ bool InAppPurchaseManager::purchase(CCString * productId, int price)
 	} else if(m_init == BillingServiceConnected) {
 		consume();
 	}
-    return true;
+    return kPurchaseSuccess;
 }
 
 // レシート再作成処理

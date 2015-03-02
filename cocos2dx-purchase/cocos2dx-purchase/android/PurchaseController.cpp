@@ -20,7 +20,7 @@ bool PurchaseController::checkPreviousPurchase(bool* success){
     return InAppPurchaseManager::getInstance().checkPreviousPurchase(success);
 }
 
-bool PurchaseController::purchase(ProductInfo& productInfo){
+PurchaseResultCode PurchaseController::purchase(ProductInfo& productInfo){
     CCString* productId = ccs(productInfo.productId().c_str());
     int price = productInfo.price();
     return InAppPurchaseManager::getInstance().purchase(productId, price);

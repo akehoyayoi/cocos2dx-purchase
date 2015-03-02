@@ -12,6 +12,7 @@
 #include "cocos2d.h"
 #include "ProductInfo.h"
 #include "PurchaseMacros.h"
+#include "PurchaseResultCode.h"
 #include <exception>
 
 NS_CC_PURCHASE_BEGIN
@@ -30,7 +31,7 @@ public:
     }
     
     bool checkPreviousPurchase(bool* success);
-    bool purchase(ProductInfo& productIndo);
+    PurchaseResultCode purchase(ProductInfo& productIndo);
     
     bool finishPurchase();
     
